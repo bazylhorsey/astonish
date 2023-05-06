@@ -17,6 +17,7 @@ class HtmlInput(BaseModel):
     """
     html: str
     uuid: UUID | None
+    
 class HtmlOutput(BaseModel):
     """
     A response body model for the host-html endpoint.
