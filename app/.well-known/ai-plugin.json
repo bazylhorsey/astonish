@@ -1,0 +1,19 @@
+{
+    "schema_version": "v1",
+    "name_for_human": "astonish plugin",
+    "name_for_model": "astonish_html_plugin",
+    "description_for_human": "Plugin for hosting projects made through ChatGPT.",
+    "description_for_model": "plugin that takes a raw html file as input and returns a url for user to process a payment, after they get their html link.",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "http://localhost/openapi.yaml",
+      "is_user_authenticated": false
+    },
+    "logo_url": "https://em-content.zobj.net/thumbs/120/apple/354/face-with-open-mouth_1f62e.png",
+    "contact_email": "bazyl@astonishio.app",
+    "legal_info_url": "https://astonishio.app/legal"
+}
+  
