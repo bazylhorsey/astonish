@@ -49,3 +49,6 @@ async def host_html(request: Request):
 async def get_plugin_manifest():
     return FileResponse("app/.well-known/ai-plugin.json")
 
+@app.get("/health")
+async def health_check():
+    return "OK"
