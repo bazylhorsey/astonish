@@ -1,9 +1,11 @@
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import JSONResponse, FileResponse, PlainTextResponse
 from pydantic import BaseModel
 import boto3
 import uuid
 import os
+import yaml
+from fastapi.openapi.utils import get_openapi
 
 app = FastAPI(
     title="Astonish.io",
@@ -45,6 +47,25 @@ async def host_html(request: Request):
     # Return the hosted HTML file URL
     hosted_url = f"https://{bucket_name}.s3.amazonaws.com/{file_key}"
     return JSONResponse(content={"url": hosted_url})
+
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="Your API Title",
+        version="1.0.0",
+        description="Your API Description",
+        routes=app.routes,
+    )
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+@app.get("/openapi.yaml", response_class=PlainTextResponse)
+async def get_openapi_yaml():
+    openapi_schema = custom_openapi()
+    openapi_yaml = yaml.safe_dump(openapi_schema)
+    return openapi_yaml
 
 @app.get("/.well-known/ai-plugin.json", response_class=FileResponse)
 async def get_plugin_manifest():
