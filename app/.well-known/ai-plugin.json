@@ -3,7 +3,7 @@
     "name_for_human": "AstonishIOHTMLHosting",
     "name_for_model": "Astonish.io HTML Hosting",
     "description_for_model": "AstonishIOHTMLHosting is a plugin to host and share interactive HTML files with ChatGPT. For better results, use keywords 'host html' and provide the raw HTML content.",
-    "description_for_human": "Astonish.io HTML Hosting is a platform for hosting and sharing interactive HTML files with ChatGPT. It allows users to host their HTML files on the cloud and share them easily.",
+    "description_for_human": "Host/share interactive HTML with ChatGPT on Astonish.io.",
     "auth": {
       "type": "none"
     },
