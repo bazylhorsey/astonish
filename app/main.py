@@ -1,13 +1,10 @@
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse, FileResponse, PlainTextResponse, RedirectResponse
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import boto3
 import uuid
 import os
-import yaml
-from fastapi.openapi.utils import get_openapi
 import stripe
-from uuid import UUID
 
 class HtmlInput(BaseModel):
     """
@@ -102,30 +99,32 @@ async def host_html(html_input: HtmlInput) -> HtmlOutput:
             }],
             mode="payment",
             success_url=hosted_url,
+            metadata={"url": hosted_url},
             cancel_url="https://astonishio.app",  # Replace with your own cancel URL
         )
 
-        # return RedirectResponse(url=session.url, status_code=303)
         return HtmlOutput(url=session.url, detail="Please click the link for $10 to host your HTML file on Astonish.io.")
 
+@app.delete("/delete-html")
+async def delete_html(url: str):
+    """
+    Deletes a hosted HTML file.
+    """
+    file_key = url.split("/")[-1]
 
-# def custom_openapi():
-#     if app.openapi_schema:
-#         return app.openapi_schema
-#     openapi_schema = get_openapi(
-#         title="Astonish.io",
-#         version="0.1.0",
-#         description="An API for hosting and sharing interactive HTML files with ChatGPT.",
-#         routes=app.routes,
-#     )
-#     app.openapi_schema = openapi_schema
-#     return app.openapi_schema
+    # Check if the object exists in the S3 bucket
+    try:
+        s3_client.head_object(Bucket=bucket_name, Key=file_key)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f"Object with UUID {file_key} not found in S3")
 
-# @app.get("/openapi.yaml", response_class=PlainTextResponse)
-# async def get_openapi_yaml():
-#     openapi_schema = custom_openapi()
-#     openapi_yaml = yaml.safe_dump(openapi_schema)
-#     return openapi_yaml
+    # Delete the object
+    try:
+        s3_client.delete_object(Bucket=bucket_name, Key=file_key)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete HTML content in S3: {str(e)}")
+
+    return {"detail": f"HTML file with UUID {file_key} has been deleted."}
 
 @app.get("/.well-known/ai-plugin.json", response_class=FileResponse)
 async def get_plugin_manifest():
