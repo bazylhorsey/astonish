@@ -16,7 +16,7 @@ class HtmlInput(BaseModel):
     If used as an update it takes a UUID that represents the HTML file to update so it is {{uuid}}.html
     """
     html: str
-    url: str
+    url: str | None
     
 class HtmlOutput(BaseModel):
     """
