@@ -7,6 +7,10 @@ import os
 import yaml
 from fastapi.openapi.utils import get_openapi
 
+
+class HtmlInput(BaseModel):
+    html: str
+
 app = FastAPI(
     title="Astonish.io",
     description="Astonish.io is a platform for hosting and sharing interactive HTML files with ChatGPT.",
@@ -23,12 +27,11 @@ s3_client = boto3.client(
 bucket_name = 'astonishio-single-file'  # Replace with your own S3 bucket name
 
 @app.post("/host-html")
-async def host_html(request: Request):
+async def host_html(html_input: HtmlInput):
     """
     Takes a raw HTML file as request input and hosts it online.
     """
-    raw_html = await request.body()
-    html_string = raw_html.decode("utf-8")
+    html_string = html_input.html
     # Generate a unique filename
     file_key = f"{uuid.uuid4()}.html"
 
