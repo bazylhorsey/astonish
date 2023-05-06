@@ -9,7 +9,7 @@
     },
     "api": {
       "type": "openapi",
-      "url": "https://goldfish-app-zr6vs.ondigitalocean.app/openapi.yaml",
+      "url": "https://goldfish-app-zr6vs.ondigitalocean.app/openapi.json",
       "is_user_authenticated": false
     },
     "logo_url": "https://em-content.zobj.net/thumbs/120/apple/354/face-with-open-mouth_1f62e.png",
