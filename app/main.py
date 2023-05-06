@@ -5,10 +5,11 @@ import boto3
 import uuid
 import os
 
-app = FastAPI()
-
-class HTMLInput(BaseModel):
-    html: str
+app = FastAPI(
+    title="Astonish.io",
+    description="Astonish.io is a platform for hosting and sharing interactive HTML files with ChatGPT.",
+    version="0.1.0",
+)
 
 s3_client = boto3.client(
     's3',
