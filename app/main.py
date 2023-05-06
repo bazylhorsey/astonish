@@ -7,11 +7,21 @@ import os
 import yaml
 from fastapi.openapi.utils import get_openapi
 import stripe
+from uuid import UUID
 
 class HtmlInput(BaseModel):
+    """
+    A request body model for the host-html and update-html endpoints.
+    It takes a raw HTML file as input and returns a hosted HTML file URL.
+    If used as an update it takes a UUID that represents the HTML file to update so it is {{uuid}}.html
+    """
     html: str
-
+    uuid: UUID | None
 class HtmlOutput(BaseModel):
+    """
+    A response body model for the host-html endpoint.
+    It returns a stripe checkout URL to pay for hosting the HTML file.
+    """
     url: str
     detail: str
 
@@ -75,7 +85,34 @@ async def host_html(html_input: HtmlInput) -> HtmlOutput:
     # return RedirectResponse(url=session.url, status_code=303)
     return HtmlOutput(url=session.url, detail="Please click the link for $10 to host your HTML file.")
     
+@app.put("/update-html")
+async def update_html(html_input: HtmlInput):
+    """
+    Takes a raw HTML file and a UUID as request input and updates the corresponding S3 object.
+    """
+    html_string = html_input.html
+    file_key = f"{html_input.uuid}.html"
 
+    # Check if the object exists in the S3 bucket
+    try:
+        s3_client.head_object(Bucket=bucket_name, Key=file_key)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f"Object with UUID {html_input.uuid} not found in S3")
+
+    # Update the object with the new HTML content
+    try:
+        s3_client.put_object(
+            Bucket=bucket_name,
+            Key=file_key,
+            Body=html_string,
+            ContentType='text/html',
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update HTML content in S3: {str(e)}")
+
+    # Return the updated hosted HTML file URL
+    hosted_url = f"https://{bucket_name}.s3.amazonaws.com/{file_key}"
+    return JSONResponse(content={"url": hosted_url})
 
 def custom_openapi():
     if app.openapi_schema:
