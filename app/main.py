@@ -1,15 +1,19 @@
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse, FileResponse, PlainTextResponse
+from fastapi.responses import JSONResponse, FileResponse, PlainTextResponse, RedirectResponse
 from pydantic import BaseModel
 import boto3
 import uuid
 import os
 import yaml
 from fastapi.openapi.utils import get_openapi
-
+import stripe
 
 class HtmlInput(BaseModel):
     html: str
+
+class HtmlOutput(BaseModel):
+    url: str
+    detail: str
 
 app = FastAPI(
     title="Astonish.io",
@@ -24,10 +28,11 @@ s3_client = boto3.client(
     region_name=os.environ['AWS_REGION']
 )
 
-bucket_name = 'astonishio-single-file'  # Replace with your own S3 bucket name
+stripe.api_key = os.environ['STRIPE_SECRET_KEY']
+bucket_name = 'astonishio-single-file'
 
 @app.post("/host-html")
-async def host_html(html_input: HtmlInput):
+async def host_html(html_input: HtmlInput) -> HtmlOutput:
     """
     Takes a raw HTML file as request input and hosts it online.
     """
@@ -49,16 +54,36 @@ async def host_html(html_input: HtmlInput):
 
     # Return the hosted HTML file URL
     hosted_url = f"https://{bucket_name}.s3.amazonaws.com/{file_key}"
-    return JSONResponse(content={"url": hosted_url})
+
+    session = stripe.checkout.Session.create(
+        payment_method_types=["card"],
+        line_items=[{
+            "price_data": {
+                "currency": "usd",
+                "unit_amount": 1000,  # Set the price in cents (e.g., $10.00)
+                "product_data": {
+                    "name": "Astonish.io HTML Hosting",
+                },
+            },
+            "quantity": 1,
+        }],
+        mode="payment",
+        success_url=hosted_url,
+        cancel_url="https://astonishio.app",  # Replace with your own cancel URL
+    )
+
+    # return RedirectResponse(url=session.url, status_code=303)
+    return HtmlOutput(url=session.url, detail="Please click the link for $10 to host your HTML file.")
+    
 
 
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
     openapi_schema = get_openapi(
-        title="Your API Title",
-        version="1.0.0",
-        description="Your API Description",
+        title="Astonish.io",
+        version="0.1.0",
+        description="An API for hosting and sharing interactive HTML files with ChatGPT.",
         routes=app.routes,
     )
     app.openapi_schema = openapi_schema
