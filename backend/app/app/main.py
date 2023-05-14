@@ -9,6 +9,7 @@ from langchain.schema import (
     HumanMessage,
     SystemMessage
 )
+from pydantic import ValidationError
 from fastapi_async_sqlalchemy import SQLAlchemyMiddleware, db
 import logging
 import gc
@@ -17,6 +18,10 @@ from app.schemas.common_schema import IChatResponse, IUserMessage
 from app.api.deps import get_redis_client
 from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect, status
 from contextlib import asynccontextmanager
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from fastapi_limiter import FastAPILimiter
+from app.utils.uuid6 import uuid7
 
 async def user_id_identifier(request: Request):
     if request.scope["type"] == "http":
@@ -69,6 +74,18 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.API_VERSION,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    lifespan=lifespan,
+)
+
+app.add_middleware(
+    SQLAlchemyMiddleware,
+    db_url=settings.ASYNC_DATABASE_URI,
+    engine_args={
+        "echo": False,
+        "pool_pre_ping": True,
+        "pool_size": settings.POOL_SIZE,
+        "max_overflow": 64,
+    },
 )
 
 @app.websocket("/chat/{user_id}")
@@ -150,7 +167,7 @@ async def root():
     An example "Hello world" FastAPI route.
     """
     # if oso.is_allowed(user, "read", message):
-    return {"message": "Hello World"}
+    return {"message": "Hello Astonish"}
 
 @app.get("/.well-known/ai-plugin.json", response_class=FileResponse)
 async def get_plugin_manifest() -> FileResponse:
