@@ -1,0 +1,1 @@
+CREATE DATABASE astonish_db;

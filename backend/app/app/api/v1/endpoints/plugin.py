@@ -15,7 +15,7 @@ s3_client = boto3.client(
     region_name=settings.AWS_REGION
 )
 
-stripe.api_key = os.environ['STRIPE_SECRET_KEY']
+stripe.api_key = settings.STRIPE_SECRET_KEY
 bucket_name = 'astonishio-single-file'
 
 @router.post("/host-html")
