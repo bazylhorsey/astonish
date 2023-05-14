@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = f"/api/{API_VERSION}"
     PROJECT_NAME: str = "Astonish.io"
 
-    OPEN_API_KEY: str
+    OPENAI_API_KEY: str
     AWS_REGION: str
     AWS_ACCESS_KEY_ID: str
     AWS_SECRET_ACCESS_KEY: str
