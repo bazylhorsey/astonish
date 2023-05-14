@@ -1,45 +1,24 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from uuid import UUID
+from fastapi import APIRouter, Depends, HTTPException, Query
 import boto3
 import uuid
 import os
 import stripe
+from app.schemas.html_schema import HtmlInput, HtmlOutput
+from app.core.config import settings
 
-class HtmlInput(BaseModel):
-    """
-    A request body model for the host-html and update-html endpoints.
-    It takes a raw HTML file as input and returns a hosted HTML file URL.
-    If used as an update it takes a UUID that represents the HTML file to update so it is {{uuid}}.html
-    """
-    html: str
-    url: str | None
-    
-class HtmlOutput(BaseModel):
-    """
-    A response body model for the host-html endpoint.
-    It returns a stripe checkout URL to pay for hosting the HTML file.
-    """
-    url: str
-    detail: str
-
-app = FastAPI(
-    title="Astonish.io",
-    description="Astonish.io is a platform for hosting and sharing interactive HTML files with ChatGPT.",
-    version="0.1.0",
-)
-
+router = APIRouter()
 s3_client = boto3.client(
     's3',
-    aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
-    aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
-    region_name=os.environ['AWS_REGION']
+    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    region_name=settings.AWS_REGION
 )
 
 stripe.api_key = os.environ['STRIPE_SECRET_KEY']
 bucket_name = 'astonishio-single-file'
 
-@app.post("/host-html")
+@router.post("/host-html")
 async def host_html(html_input: HtmlInput) -> HtmlOutput:
     """
     Takes a raw HTML file as request input and hosts it online. IF the user also puts a UUID in the request body, it will update the corresponding file.
@@ -105,7 +84,7 @@ async def host_html(html_input: HtmlInput) -> HtmlOutput:
 
         return HtmlOutput(url=session.url, detail="Please click the link for $10 to host your HTML file on Astonish.io.")
 
-@app.delete("/delete-html")
+@router.delete("/delete-html")
 async def delete_html(url: str):
     """
     Deletes a hosted HTML file.
@@ -125,7 +104,3 @@ async def delete_html(url: str):
         raise HTTPException(status_code=500, detail=f"Failed to delete HTML content in S3: {str(e)}")
 
     return {"detail": f"HTML file with UUID {file_key} has been deleted."}
-
-@app.get("/.well-known/ai-plugin.json", response_class=FileResponse)
-async def get_plugin_manifest():
-    return FileResponse("app/.well-known/ai-plugin.json")

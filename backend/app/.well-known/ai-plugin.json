@@ -3,13 +3,13 @@
     "name_for_human": "Astonish.io HTML Hosting",
     "name_for_model": "AstonishHTMLHosting",
     "description_for_model": "Astonish.io HTML Hosting is a plugin to host and share interactive HTML files with ChatGPT. For better results, use keywords 'host html' and provide the raw HTML content. User may also provide a url in the request to directly edit/regenerate the site",
-    "description_for_human": "Host/share interactive HTML with ChatGPT on Astonish.io.",
+    "description_for_human": "Host/share interactive HTML using ChatGPT on Astonish.io.",
     "auth": {
       "type": "none"
     },
     "api": {
       "type": "openapi",
-      "url": "https://goldfish-app-zr6vs.ondigitalocean.app/openapi.json",
+      "url": "https://api.astonishio.app/openapi.json",
       "is_user_authenticated": false
     },
     "logo_url": "https://em-content.zobj.net/thumbs/120/apple/354/face-with-open-mouth_1f62e.png",
