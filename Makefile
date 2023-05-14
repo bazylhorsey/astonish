@@ -15,3 +15,8 @@ run:
 
 stop:
 	docker compose down
+
+add-dev-migration:
+	docker compose -f docker-compose.yml exec astonish_server alembic revision --autogenerate && \
+	docker compose -f docker-compose.yml exec astonish_server alembic upgrade head && \
+	echo "Migration added and applied."
