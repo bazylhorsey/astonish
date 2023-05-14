@@ -87,7 +87,7 @@ async def login(
             settings.REFRESH_TOKEN_EXPIRE_MINUTES,
         )
 
-    return create_response(meta=meta_data, data=data, message="Login correctly")
+    return create_response(data=data, message="Login correctly")
 
 
 @router.post("/change_password")
