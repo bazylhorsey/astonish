@@ -17,7 +17,6 @@ class IUserCreate(UserBase):
 class IUserUpdate(UserBase):
     pass
 
-
 class IUserRead(UserBase):
     id: UUID
 

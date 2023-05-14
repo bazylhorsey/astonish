@@ -11,3 +11,4 @@ sqlachemy-orm==1.2.9
 sqlmodel==0.0.8
 SQLAlchemy-Utils==0.41.1
 redis==4.5.5
+fastapi_pagination==0.12.3

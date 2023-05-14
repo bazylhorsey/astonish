@@ -42,6 +42,6 @@ class Settings(BaseSettings):
         )
     
     SECRET_KEY: str = secrets.token_urlsafe(32)
-    ENCRYPT_KEY = secrets.token_urlsafe(32)
+    ENCRYPT_KEY: str = secrets.token_urlsafe(32)
     
 settings = Settings()

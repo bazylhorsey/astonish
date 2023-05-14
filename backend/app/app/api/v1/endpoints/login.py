@@ -19,6 +19,19 @@ from app.core.config import settings
 from app.schemas.common_schema import TokenType, IMetaGeneral
 from app.schemas.token_schema import TokenRead, Token, RefreshToken
 from app.schemas.response_schema import IPostResponseBase, create_response
+from app.deps import user_deps
+
+from app.schemas.user_schema import (
+    IUserCreate,
+    IUserRead,
+)
+
+from fastapi import (
+    APIRouter,
+    Body,
+    Depends,
+    status,
+)
 
 router = APIRouter()
 
@@ -27,7 +40,6 @@ router = APIRouter()
 async def login(
     email: EmailStr = Body(...),
     password: str = Body(...),
-    meta_data: IMetaGeneral = Depends(deps.get_general_meta),
     redis_client: Redis = Depends(get_redis_client),
 ) -> IPostResponseBase[Token]:
     """
@@ -222,3 +234,17 @@ async def login_access_token(
         "access_token": access_token,
         "token_type": "bearer",
     }
+
+
+@router.post("", status_code=status.HTTP_201_CREATED)
+async def create_user(
+    new_user: IUserCreate = Depends(user_deps.user_exists),
+) -> IPostResponseBase[IUserRead]:
+    """
+    Creates a new user
+
+    Required roles:
+    - admin
+    """
+    user = await crud.user.create_user(obj_in=new_user)
+    return create_response(data=user)

@@ -2,7 +2,6 @@ from uuid import UUID
 from app.utils.uuid6 import uuid7
 from pydantic import BaseModel, validator
 from enum import Enum
-from app.schemas.role_schema import IRoleRead
 
 
 class IGenderEnum(str, Enum):
@@ -10,15 +9,9 @@ class IGenderEnum(str, Enum):
     male = "male"
     other = "other"
 
-
-class IMetaGeneral(BaseModel):
-    roles: list[IRoleRead]
-
-
 class IOrderEnum(str, Enum):
     ascendent = "ascendent"
     descendent = "descendent"
-
 
 class TokenType(str, Enum):
     ACCESS = "access_token"

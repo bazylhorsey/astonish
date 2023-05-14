@@ -1,6 +1,4 @@
 from app.models.base_uuid_model import BaseUUIDModel
-from app.models.links_model import LinkGroupUser
-from app.models.image_media_model import ImageMedia
 from app.schemas.common_schema import IGenderEnum
 from datetime import datetime
 from sqlmodel import BigInteger, Field, SQLModel, Relationship, Column, DateTime, String
@@ -21,7 +19,6 @@ class UserBase(SQLModel):
     birthdate: datetime | None = Field(
         sa_column=Column(DateTime(timezone=True), nullable=True)
     )  # birthday with timezone
-    role_id: UUID | None = Field(default=None, foreign_key="Role.id")
     phone: str | None
     gender: IGenderEnum | None = Field(
         default=IGenderEnum.other,
@@ -34,24 +31,3 @@ class UserBase(SQLModel):
 
 class User(BaseUUIDModel, UserBase, table=True):
     hashed_password: str | None = Field(nullable=False, index=True)
-    role: Optional["Role"] = Relationship(  # noqa: F821
-        back_populates="users", sa_relationship_kwargs={"lazy": "joined"}
-    )
-    groups: list["Group"] = Relationship(  # noqa: F821
-        back_populates="users",
-        link_model=LinkGroupUser,
-        sa_relationship_kwargs={"lazy": "selectin"},
-    )
-    image_id: UUID | None = Field(default=None, foreign_key="ImageMedia.id")
-    image: ImageMedia = Relationship(
-        sa_relationship_kwargs={
-            "lazy": "joined",
-            "primaryjoin": "User.image_id==ImageMedia.id",
-        }
-    )
-    follower_count: int | None = Field(
-        sa_column=Column(BigInteger(), server_default="0")
-    )
-    following_count: int | None = Field(
-        sa_column=Column(BigInteger(), server_default="0")
-    )
