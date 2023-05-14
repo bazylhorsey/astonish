@@ -9,7 +9,7 @@ from langchain.schema import (
     HumanMessage,
     SystemMessage
 )
-from app.api.deps import get_redis_client
+#from app.api.deps import get_redis_client
 from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect, status
 
 app = FastAPI(
