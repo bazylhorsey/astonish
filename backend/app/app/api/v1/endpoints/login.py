@@ -16,7 +16,7 @@ from app import crud
 from app.api import deps
 from app.core import security
 from app.core.config import settings
-from app.schemas.common_schema import TokenType, IMetaGeneral
+from app.schemas.common_schema import TokenType
 from app.schemas.token_schema import TokenRead, Token, RefreshToken
 from app.schemas.response_schema import IPostResponseBase, create_response
 from app.deps import user_deps
@@ -236,7 +236,7 @@ async def login_access_token(
     }
 
 
-@router.post("", status_code=status.HTTP_201_CREATED)
+@router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def create_user(
     new_user: IUserCreate = Depends(user_deps.user_exists),
 ) -> IPostResponseBase[IUserRead]:

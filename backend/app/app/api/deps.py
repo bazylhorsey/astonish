@@ -8,9 +8,9 @@ from pydantic import ValidationError
 from app import crud
 from app.core import security
 from app.core.config import settings
-from app.db.session import SessionLocal, SessionLocalCelery
+from app.db.session import SessionLocal
 from sqlmodel.ext.asyncio.session import AsyncSession
-from app.schemas.common_schema import IMetaGeneral, TokenType
+from app.schemas.common_schema import TokenType
 import redis.asyncio as aioredis
 from redis.asyncio import Redis
 
@@ -33,16 +33,6 @@ async def get_redis_client() -> Redis:
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with SessionLocal() as session:
         yield session
-
-
-async def get_jobs_db() -> AsyncGenerator[AsyncSession, None]:
-    async with SessionLocalCelery() as session:
-        yield session
-
-
-async def get_general_meta() -> IMetaGeneral:
-    current_roles = await crud.role.get_multi(skip=0, limit=100)
-    return IMetaGeneral(roles=current_roles)
 
 
 def get_current_user(required_roles: list[str] = None) -> User:
