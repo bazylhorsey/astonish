@@ -41,4 +41,7 @@ class Settings(BaseSettings):
             path=f"/{values.get('DATABASE_NAME') or ''}",
         )
     
+    SECRET_KEY: str = secrets.token_urlsafe(32)
+    ENCRYPT_KEY = secrets.token_urlsafe(32)
+    
 settings = Settings()
