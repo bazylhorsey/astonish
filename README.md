@@ -1,4 +1,4 @@
-# a ChatGPT 3.0-era lovable.
+# a ChatGPT 3.0-era Lovable.
 Presented at OpenAI Hackathon Chicago 2022.
 
 A simple SaaS to create human-in-the-loop design of websites that include infrastructure (via Pulumi).
